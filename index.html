@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IICT Student Registry System - Lavender Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-canvas: #f5f3fa;
+            --surface-panel: #ffffff;
+            
+            /* Light Lavender Theme Palette */
+            --lavender-primary: #8b6fd7;
+            --lavender-dark: #4a3487;
+            --lavender-light: #f1edfd;
+            --lavender-border: #e2daf7;
+            --text-heading: #231942;
+            --text-body: #5e5577;
+            
+            /* Action Button Colors mapped to the dashboard layout */
+            --color-save: #7052c4;
+            --color-update: #3b82f6;
+            --color-delete: #ef4444;
+            --color-clear: #6b7280;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-body);
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Standardized shell to keep it compact on laptop screens and perfect on mobile */
+        .app-shell {
+            width: 100%;
+            max-width: 460px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Top Title Branding Bar (No University Logo) */
+        .app-header {
+            background: linear-gradient(135deg, var(--lavender-dark) 0%, #654fa3 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px 16px;
+            box-shadow: 0 4px 12px rgba(35, 25, 66, 0.15);
+        }
+
+        .app-header h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .app-header p {
+            font-size: 0.75rem;
+            opacity: 0.85;
+            margin-top: 2px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Content Panel Blocks */
+        .dashboard-card {
+            background: var(--surface-panel);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--lavender-border);
+            box-shadow: 0 2px 8px rgba(35, 25, 66, 0.03);
+        }
+
+        /* Intro Banner Feature Block with Row Layout */
+        .intro-block {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .intro-text h2 {
+            font-size: 1rem;
+            color: var(--lavender-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .intro-text p {
+            font-size: 0.75rem;
+            line-height: 1.4;
+            color: var(--text-body);
+        }
+
+        .intro-icon {
+            font-size: 2.2rem;
+            color: var(--lavender-primary);
+            opacity: 0.9;
+        }
+
+        /* Section Structural Headings */
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--lavender-dark);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Form Input Field Row Configurations */
+        .input-wrapper {
+            margin-bottom: 14px;
+        }
+
+        .input-wrapper label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            margin-bottom: 6px;
+        }
+
+        /* Input Enclosure with Inner Icons */
+        .field-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--lavender-primary);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
+        .field-container input, .field-container select {
+            width: 100%;
+            padding: 11px 12px 11px 38px;
+            border: 1px solid #d1c7ed;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--text-heading);
+            background-color: #ffffff;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .field-container input:focus, .field-container select:focus {
+            border-color: var(--lavender-primary);
+            box-shadow: 0 0 0 3px rgba(139, 111, 215, 0.15);
+        }
+
+        /* System Action Toast Banner */
+        .status-toast {
+            background-color: var(--lavender-light);
+            color: var(--lavender-dark);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            margin-bottom: 16px;
+            font-weight: 500;
+            border-left: 4px solid var(--lavender-primary);
+        }
+
+        /* Button Layout Configuration Grid */
+        .btn-grid-layout {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .control-btn {
+            padding: 11px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: opacity 0.15s ease;
+        }
+
+        .control-btn:active { opacity: 0.85; }
+
+        .btn-save { background-color: var(--color-save); }
+        .btn-update { background-color: var(--color-update); }
+        .btn-delete { background-color: var(--color-delete); }
+        .btn-clear { background-color: var(--color-clear); }
+
+        /* Search Layout Container */
+        .search-box-bar {
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .search-box-bar input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border: 1px solid var(--lavender-border);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .search-box-bar .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            color: var(--text-body);
+        }
+
+        /* Tabular Database View Style Layout */
+        .table-responsive-box {
+            width: 100%;
+            overflow-x: auto;
+            max-height: 240px;
+        }
+
+        .directory-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            text-align: left;
+        }
+
+        .directory-table th {
+            background-color: var(--lavender-dark);
+            color: #ffffff;
+            padding: 10px 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .directory-table th:first-child { border-top-left-radius: 4px; }
+        .directory-table th:last-child { border-top-right-radius: 4px; }
+
+        .directory-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--lavender-border);
+            color: var(--text-heading);
+            background-color: #ffffff;
+        }
+
+        .directory-table tr.selected-row td {
+            background-color: #eaddff !important;
+        }
+
+        /* Small Action Inline Buttons */
+        .inline-action-row {
+            display: flex;
+            gap: 4px;
+        }
+
+        .mini-btn {
+            padding: 4px 6px;
+            border: 1px solid var(--lavender-border);
+            background: #ffffff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mini-btn:hover {
+            background-color: var(--lavender-light);
+            border-color: var(--lavender-primary);
+        }
+
+        .no-records-card {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: var(--text-body);
+            background: #ffffff;
+            border-bottom: 1px solid var(--lavender-border);
+        }
+
+        /* Copyright Footer Accent Stamp */
+        .system-footer {
+            text-align: center;
+            padding: 8px 0;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: var(--text-body);
+            border-top: 1px solid var(--lavender-border);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-shell">
+        <div class="app-header">
+            <h1>IICT Student Information System</h1>
+            <p>Department of Information & Communications Technology</p>
+        </div>
+
+        <div class="dashboard-card intro-block">
+            <div class="intro-text">
+                <h2>Student Management</h2>
+                <p>Add, update, delete and manage your department student records efficiently.</p>
+            </div>
+            <div class="intro-icon">💻</div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="section-title">👤 Student Information</div>
+            
+            <div class="input-wrapper">
+                <label for="student-id">Student ID</label>
+                <div class="field-container">
+                    <span class="field-icon">🪪</span>
+                    <input type="text" id="student-id" placeholder="Enter Student ID">
+                </div>
+            </div>
+
+            <div class="input-wrapper">
+                <label for="student-name">Student Name</label>
+                <div class="field-container">
+                    <span class="field-icon">👤</span>
+                    <input type="text" id="student-name" placeholder="Enter Student Name">
+                </div>
+            </div>
+
+            <div class="input-wrapper">
+                <label for="year-level">Year Level</label>
+                <div class="field-container">
+                    <span class="field-icon">🎓</span>
+                    <select id="year-level">
+                        <option value="">Select Year Level</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="status-toast" id="status-message">
+                Ready to handle registry queries.
+            </div>
+
+            <div class="btn-grid-layout">
+                <button class="control-btn btn-save" id="btn-add">📥 Save</button>
+                <button class="control-btn btn-update" id="btn-update">📝 Update</button>
+                <button class="control-btn btn-delete" id="btn-delete">🗑️ Delete</button>
+                <button class="control-btn btn-clear" id="btn-clear">🔄 Clear</button>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="section-title">📋 Student Records</div>
+            
+            <div class="search-box-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-bar" placeholder="Search student...">
+            </div>
+
+            <div class="table-responsive-box">
+                <table class="directory-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Year Level</th>
+                            <th style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body-target">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="system-footer">
+            &copy; 2026 IICT Student Information System &bull; All rights reserved.
+        </div>
+    </div>
+
+    <script>
+        let studentsArray = [];
+        let targetSelectedId = null;
+
+        const inputId = document.getElementById('student-id');
+        const inputName = document.getElementById('student-name');
+        const inputYear = document.getElementById('year-level');
+        const searchBar = document.getElementById('search-bar');
+        const tableBody = document.getElementById('table-body-target');
+        const statusBox = document.getElementById('status-message');
+
+        function syncDatabase() {
+            renderTableRecords(searchBar.value.trim());
+            if (window.AppInventor && window.AppInventor.setWebViewString) {
+                window.AppInventor.setWebViewString(JSON.stringify(studentsArray));
+            }
+        }
+
+        window.loadNativeData = function(jsonDataString) {
+            if (jsonDataString) {
+                try {
+                    studentsArray = JSON.parse(jsonDataString);
+                    renderTableRecords();
+                    pushStatus("Data directories synced natively.");
+                } catch (e) {
+                    console.log("Error running JSON storage initialization vector.");
+                }
+            }
+        };
+
+        function pushStatus(text) {
+            statusBox.innerText = text;
+        }
+
+        function clearForm() {
+            inputId.value = "";
+            inputName.value = "";
+            inputYear.value = "";
+            targetSelectedId = null;
+            inputId.disabled = false;
+            
+            const activeRows = document.querySelectorAll('.directory-table tr');
+            activeRows.forEach(row => row.classList.remove('selected-row'));
+            pushStatus("Form parameters cleared.");
+        }
+
+        function renderTableRecords(filterText = "") {
+            tableBody.innerHTML = "";
+            const matches = studentsArray.filter(student => {
+                const query = filterText.toLowerCase();
+                return student.id.toLowerCase().includes(query) || student.name.toLowerCase().includes(query);
+            });
+
+            if (matches.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5"><div class="no-records-card">No student accounts registered.</div></td></tr>`;
+                return;
+            }
+
+            matches.forEach((student, index) => {
+                const tableRow = document.createElement('tr');
+                if (targetSelectedId === student.id) {
+                    tableRow.className = "selected-row";
+                }
+                
+                tableRow.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${student.id}</td>
+                    <td style="font-weight: 500;">${student.name}</td>
+                    <td>${student.year}</td>
+                    <td style="text-align: center;">
+                        <div class="inline-action-row" style="justify-content: center;">
+                            <button class="mini-btn" title="Edit Record" onclick="setupEdit('${student.id}')">📝</button>
+                            <button class="mini-btn" title="Drop Record" onclick="triggerDirectDelete('${student.id}')">❌</button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tableRow);
+            });
+        }
+
+        window.setupEdit = function(id) {
+            const student = studentsArray.find(s => s.id === id);
+            if (student) {
+                targetSelectedId = student.id;
+                inputId.value = student.id;
+                inputId.disabled = true;
+                inputName.value = student.name;
+                
+                // Normalizes data structure strings if they contain "Year Level X" down to just the digit index
+                let plainYear = student.year;
+                if(plainYear.includes("Level")) {
+                    plainYear = plainYear.replace("Year Level ", "").trim();
+                }
+                inputYear.value = plainYear;
+                
+                pushStatus(`Viewing file context for: ${student.name}`);
+                renderTableRecords(searchBar.value.trim());
+            }
+        };
+
+        window.triggerDirectDelete = function(id) {
+            studentsArray = studentsArray.filter(s => s.id !== id);
+            if(targetSelectedId === id) clearForm();
+            pushStatus("Record dropped from device memory.");
+            syncDatabase();
+        };
+
+        document.getElementById('btn-add').addEventListener('click', () => {
+            const idValue = inputId.value.trim();
+            const nameValue = inputName.value.trim();
+            const yearValue = inputYear.value;
+
+            if (!idValue || !nameValue || !yearValue) {
+                pushStatus("Notice: Missing input criteria fields.");
+                return;
+            }
+
+            if (studentsArray.some(s => s.id === idValue)) {
+                pushStatus("Conflict: This Student ID code already exists.");
+                return;
+            }
+
+            // Normalizes input label text format to display natively
+            studentsArray.push({ id: idValue, name: nameValue, year: yearValue });
+            pushStatus(`Saved: ${nameValue}`);
+            clearForm();
+            syncDatabase();
+        });
+
+        document.getElementById('btn-update').addEventListener('click', () => {
+            if (!targetSelectedId) {
+                pushStatus("Notice: Click the edit icon (📝) on the record table first.");
+                return;
+            }
+
+            const nameValue = inputName.value.trim();
+            const yearValue = inputYear.value;
+
+            if (!nameValue || !yearValue) {
+                pushStatus("Notice: Mandatory fields cannot be submitted blank.");
+                return;
+            }
+
+            const targetIndex = studentsArray.findIndex(s => s.id === targetSelectedId);
+            if (targetIndex !== -1) {
+                studentsArray[targetIndex].name = nameValue;
+                studentsArray[targetIndex].year = yearValue;
+                pushStatus(`Updated profile profile entries for: ${nameValue}`);
+                clearForm();
+                syncDatabase();
+            }
+        });
+
+        document.getElementById('btn-delete').addEventListener('click', () => {
+            if (!targetSelectedId) {
+                pushStatus("Notice: Highlight a data index from the table row map.");
+                return;
+            }
+            triggerDirectDelete(targetSelectedId);
+        });
+
+        document.getElementById('btn-clear').addEventListener('click', clearForm);
+        searchBar.addEventListener('input', (e) => renderTableRecords(e.target.value.trim()));
+
+        // Run primary visual mapping layout renders
+        renderTableRecords();
+    </script>
+</body>
+</html>
